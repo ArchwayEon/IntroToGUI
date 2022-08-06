@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IntroToGUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "IntroToGUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
