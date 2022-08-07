@@ -15,6 +15,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics;
@@ -25,9 +26,6 @@ using WinRT.Interop;
 
 namespace IntroToGUI;
 
-/// <summary>
-/// An empty window that can be used on its own or navigated to within a Frame.
-/// </summary>
 public sealed partial class MainWindow : Window
 {
     private AppWindow _appWindow;
@@ -39,6 +37,7 @@ public sealed partial class MainWindow : Window
         _appWindow = GetAppWindowForCurrentWindow();
         _appWindow.Title = "Introduction to GUI Programming";
         _appWindow.Resize(new SizeInt32(800, 600));
+        _appWindow.Closing += OnMainWindowClosing;
         CreateThings();
     }
 
@@ -47,6 +46,32 @@ public sealed partial class MainWindow : Window
         IntPtr hWnd = WindowNative.GetWindowHandle(this);
         WindowId wndId = Win32Interop.GetWindowIdFromWindow(hWnd);
         return AppWindow.GetFromWindowId(wndId);
+    }
+
+    private async void OnMainWindowClosing(object sender, AppWindowClosingEventArgs e)
+    {
+        ContentDialog confirmDialog = new()
+        {
+            XamlRoot = MainPanel.XamlRoot,
+            Title = "Do you want to close the window?",
+            Content = "Please confirm that you want to close the window.",
+            CloseButtonText = "No, don't close",
+            PrimaryButtonText = "Yes, close"
+        };
+        e.Cancel = true;
+        try
+        {
+            ContentDialogResult result = await confirmDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                this.Close();
+            }
+        }
+        catch (Exception)
+        {
+            // Possibly another asynchronous operation; allow that operation 
+            // to continue.
+        }
     }
 
     private void CreateThings()
